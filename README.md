@@ -27,6 +27,7 @@ python capital_gains_calc.py -i transactions.csv -o capital_gains_report.csv
 - `-v, --verbose`: Increase output verbosity (default: False)
 - `-f, --overwrite`: Overwrite destination file if exists (default: False)
 - `-d, --fmv_data_file`: Grandfathered ISIN price data file (default: Grandfathered_ISIN_Prices.csv)
+- `--tax_rates_file`: TAX_RATES_FILE. Optional JSON file with FY-specific tax rates
 
 ## Input Data Format
 ### Transaction Data CSV
