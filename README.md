@@ -86,3 +86,5 @@ waitress-serve --host=0.0.0.0 --port=8000 app:app
 cd frontend
 npm run dev
 ```
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/79man/capital_gains_calculator)
