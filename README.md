@@ -73,3 +73,16 @@ This project is open source. Please check the repository for license details.
 - The grandfathered prices dataset contains Fair Market Values sourced from Bloomberg, NSE, and BSE data as of October 31, 2018
 - Warning messages are displayed for insufficient buy quantities or split ratio calculation issues
 - The tool is specifically designed for Indian capital gains tax compliance and follows Indian tax regulations
+
+## Additional notes for new version
+1. To Run the Backend
+```shell
+cd backend
+waitress-serve --host=0.0.0.0 --port=8000 app:app
+```
+
+2. To run the Vue Frontend
+```shell
+cd frontend
+npm run dev
+```
