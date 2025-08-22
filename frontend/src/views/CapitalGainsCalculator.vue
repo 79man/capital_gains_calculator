@@ -105,6 +105,16 @@ export default {
             this.processingError = null
 
             try {
+                // Validate required files  
+                if (!this.transactionsFile) {
+                    throw new Error('Transactions file is required')
+                }
+
+                // Validate LTCG threshold  
+                if (this.config.ltcgThresholdDays < 1 || this.config.ltcgThresholdDays > 3650) {
+                    throw new Error('LTCG threshold must be between 1 and 3650 days')
+                }
+
                 const formData = new FormData()
                 formData.append('transactions_file', this.transactionsFile)
                 if (this.fmvFile) formData.append('fmv_file', this.fmvFile)
@@ -120,7 +130,7 @@ export default {
                 // Auto-collapse sections after successful calculation  
                 this.showConfigSection = false
             } catch (error) {
-                console.error('Calculation failed:', error)
+                console.error('Capital Gains Calculation failed:', error)
                 this.processingError = error.message || "Error in calling API"
                 // Handle error display  
             } finally {
@@ -128,19 +138,56 @@ export default {
             }
         },
         parseCSV(csvText) {
-            const lines = csvText.split('\n')
-            const headers = lines[0].split(',')
+            if (!csvText || typeof csvText !== 'string') {
+                throw new Error('Invalid CSV text provided')
+            }
+            const lines = csvText.split('\n').filter(line => line.trim().length > 0)
+
+            if (lines.length === 0) {
+                throw new Error('CSV file is empty')
+            }
+
+            // Parse CSV with proper quote handling  
+            const parseCSVLine = (line) => {
+                const result = []
+                let current = ''
+                let inQuotes = false
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i]
+                    const nextChar = line[i + 1]
+
+                    if (char === '"') {
+                        if (inQuotes && nextChar === '"') {
+                            current += '"'
+                            i++ // Skip next quote  
+                        } else {
+                            inQuotes = !inQuotes
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim())
+                        current = ''
+                    } else {
+                        current += char
+                    }
+                }
+                result.push(current.trim())
+                return result
+            }
+            const headers = parseCSVLine(lines[0])
             const results = []
 
             for (let i = 1; i < lines.length; i++) {
-                if (lines[i].trim()) {
-                    const values = lines[i].split(',')
-                    const row = {}
-                    headers.forEach((header, index) => {
-                        row[header.trim()] = values[index]?.trim()
-                    })
-                    results.push(row)
+                const values = parseCSVLine(lines[i])
+                // Skip rows that are completely empty  
+                if (values.every(val => !val)) {
+                    continue
                 }
+                const row = {}
+                headers.forEach((header, index) => {
+                    row[header.trim()] = values[index]?.trim()
+                })
+                results.push(row)
             }
 
             return results

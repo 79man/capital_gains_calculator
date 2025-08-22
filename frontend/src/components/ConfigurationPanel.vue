@@ -50,14 +50,14 @@
       </div>
       <div class="config-item">
         <label>
-          <input type="number" 
-          :value="ltcgThresholdDays" 
-          @input="$emit('update:ltcg-threshold-days', Number($event.target.value)) " />
+          <input type="number" :value="ltcgThresholdDays" @input="handleLtcgThresholdChange($event)" min="1" max="3650"
+            step="1" />
           LTCG Threshold (in days)
         </label>
         <p class="config-description">
-          LTCG Threshold in Days (default: 365)
+          LTCG Threshold in Days (1-3650, default: 365)
         </p>
+        <div v-if="ltcgError" class="error-message">{{ ltcgError }}</div>
       </div>
     </div>
   </div>
@@ -88,6 +88,24 @@ export default {
       default: 100
     }
   },
+  data() {
+    return {
+      ltcgError: null
+    }
+  },
+  methods: {
+    handleLtcgThresholdChange(event) {
+      const value = Number(event.target.value)
+      this.ltcgError = null
+
+      if (isNaN(value) || value < 1 || value > 3650) {
+        this.ltcgError = 'LTCG threshold must be between 1 and 3650 days'
+        return
+      }
+
+      this.$emit('update:ltcg-threshold-days', value)
+    }
+  },
   emits: [
     'update:verbose',
     'update:same-source-only',
@@ -95,7 +113,7 @@ export default {
     'update:include-dividends',
     'update:ltcg-threshold-days'
   ]
-}  
+}
 </script>
 
 <style scoped>
@@ -142,5 +160,12 @@ export default {
   font-size: 0.875rem;
   color: #6c757d;
   line-height: 1.4;
+}
+
+.error-message {
+  margin-top: 0.5rem;
+  color: #f73f3f;
+  font-size: small;
+  font-weight: bold;
 }
 </style>

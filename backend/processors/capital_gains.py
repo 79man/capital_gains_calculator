@@ -5,8 +5,8 @@ from typing import Final
 from enum import Enum
 
 # CONFIGURATION
-FALLBACK_LTCG_RATE: Final = 0.1
-FALLBACK_STCG_RATE: Final = 0.15
+FALLBACK_LTCG_RATE: Final = 0.125
+FALLBACK_STCG_RATE: Final = 0.2
 
 
 class CG_Tye(Enum):
@@ -79,12 +79,9 @@ class CGProcessor(TransactionProcessor):
                 else:
                     print(
                         f"Warning: Could not infer split ratio for {company} on {tdate} (pre_split_balance={pre_split_balance}, qty={qty})")
-                    # Fallback
-                    split_ratio = 1
-
-                for lot in lots:
-                    lot['shares'] *= split_ratio
-                    lot['price'] /= split_ratio
+                    # Don't apply any changes if we can't calculate ratio  
+                    if pre_split_balance == 0:  
+                        print(f"Error: No existing shares for stock split of {company}")
 
             # Sells
             elif ctype in [
